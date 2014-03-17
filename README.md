@@ -1,4 +1,4 @@
-# localForage Backbone
+# localForage Backbone [![Build Status](https://secure.travis-ci.org/mozilla/localForage-backbone.png?branch=master)](http://travis-ci.org/mozilla/localForage-backbone)
 
 Backbone.js driver for the
 [localForage offline storage library](https://github.com/mozilla/localForage).
