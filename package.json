@@ -1,0 +1,34 @@
+{
+  "name": "localforage-backbone",
+  "author": "Mozilla",
+  "description": "Backbone.js driver for localForage.",
+  "keywords": [
+    "indexeddb",
+    "localstorage",
+    "storage",
+    "websql"
+  ],
+  "version": "0.1.0",
+  "homepage": "https://github.com/mozilla/localForage-backbone",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mozilla/localForage-backbone.git"
+  },
+  "scripts": {
+    "prepublish": "grunt build",
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.2",
+    "grunt-casper": "^0.3.3",
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-contrib-uglify": "^0.4.0",
+    "uglify-js": "^2.3.x"
+  },
+  "browser": "dist/localforage.backbone.js",
+  "main": "dist/localforage.backbone.js",
+  "licence": "Apache-2.0",
+  "bugs": {
+    "url": "http://github.com/mozilla/localForage-backbone/issues"
+  }
+}
