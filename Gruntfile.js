@@ -29,15 +29,28 @@ module.exports = exports = function(grunt) {
                     'dist/localforage.backbone.min.js': ['dist/localforage.backbone.js']
                 }
             }
+        },
+        jasmine: {
+            backbone: {
+                options: {
+                    specs: 'test/**/*.js',
+                    vendor: [
+                        'bower_components/underscore/underscore.js',
+                        'bower_components/backbone/backbone.js',
+                        'bower_components/localforage/dist/localforage.js',
+                        'dist/localforage.backbone.js'
+                    ]
+                }
+            }
         }
     });
 
-    grunt.loadNpmTasks('grunt-casper');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build', ['concat', 'uglify']);
 
-    grunt.registerTask('test', ['build']);
+    grunt.registerTask('test', ['build', 'jasmine']);
 };
