@@ -1,4 +1,4 @@
-/*global exports:true, require:true */
+/*global exports:true */
 module.exports = exports = function(grunt) {
     'use strict';
 
@@ -46,8 +46,8 @@ module.exports = exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build', ['concat', 'uglify']);
