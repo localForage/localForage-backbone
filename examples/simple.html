@@ -27,9 +27,9 @@
           // We store offline data inside a collection. This is how we tell
           // a model/collection to store data offline with localForage.
           var MyCollection = Backbone.Collection.extend({
-              sync: Backbone.localforage.sync('MyOfflineStore'),
+              sync: Backbone.localforage.sync('MyCollection'),
               model: Backbone.Model.extend({
-                  sync: Backbone.localforage.sync()
+                  sync: Backbone.localforage.sync('ModelNamespace')
               })
           });
 

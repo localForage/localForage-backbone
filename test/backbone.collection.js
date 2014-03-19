@@ -6,7 +6,7 @@ describe('Backbone.Collection', function() {
         // Making sure we use an unique localforage namespace by using Date.now
         sync: Backbone.localforage.sync(Date.now()),
         model: Backbone.Model.extend({
-            sync: Backbone.localforage.sync()
+            sync: Backbone.localforage.sync('ModelNamespace')
         })
     });
 
@@ -28,7 +28,7 @@ describe('Backbone.Collection', function() {
                 id = model.get('id');
 
                 expect(model).toBeDefined();
-                expect(model.get('id')).toBeDefined();
+                expect(id).toBeDefined();
                 expect(model.get('hello')).toEqual('world!');
 
                 done();
