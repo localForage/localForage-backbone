@@ -13,6 +13,23 @@ Run tests with grunt:
 
 Submit issues, pull requests, etc. if something is up! <3
 
+## Usage
+
+This library lets you override the `sync()` method on your collections and
+models so they're saved to localForage instead of a REST server. Simply
+override your objects' `sync()` method with the namespace for your model:
+
+    var MyModel = Backbone.Collection.extend({
+        sync: Backbone.localforage.sync('MyModel')
+    });
+    var MyCollection = Backbone.Collection.extend({
+        model: MyModel,
+        sync: Backbone.localforage.sync('MyCollection')
+    });
+
+Now whenever you save your collections or models, they'll be saved with
+localForage!
+
 # License
 
 This program is free software; it is distributed under an
