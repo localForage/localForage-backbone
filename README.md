@@ -19,6 +19,7 @@ This library lets you override the `sync()` method on your collections and
 models so they're saved to localForage instead of a REST server. Simply
 override your objects' `sync()` method with the namespace for your model:
 
+```javascript
     var MyModel = Backbone.Collection.extend({
         sync: Backbone.localforage.sync('MyModel')
     });
@@ -26,6 +27,7 @@ override your objects' `sync()` method with the namespace for your model:
         model: MyModel,
         sync: Backbone.localforage.sync('MyCollection')
     });
+```
 
 Now whenever you save your collections or models, they'll be saved with
 localForage!
