@@ -31,15 +31,16 @@
 // Inspiration for this file comes from a few backbone.localstorage
 // implementations.
 (function (root, factory) {
-  if (typeof define === 'function' && define.amd)
-    define(['localforage', 'backbone', 'underscore'], factory);
-  else if (typeof module !== 'undefined' && module.exports) {
-    var localforage = require('localforage');
-    var Backbone = require('backbone');
-    var _ = require('underscore');
-    module.exports = factory(localforage, Backbone, _);
-  } else
-    factory(root.localforage, root.Backbone, root._);
+    if (typeof define === 'function' && define.amd) {
+        define(['localforage', 'backbone', 'underscore'], factory);
+    } else if (typeof module !== 'undefined' && module.exports) {
+        var localforage = require('localforage');
+        var Backbone = require('backbone');
+        var _ = require('underscore');
+        module.exports = factory(localforage, Backbone, _);
+    } else {
+        factory(root.localforage, root.Backbone, root._);
+    }
 }(this, function (localforage, Backbone, _) {
     function S4() {
         return ((1 + Math.random()) * 65536 | 0).toString(16).substring(1);
@@ -55,19 +56,21 @@
         sync: function(name) {
             var _this = this;
             var sync = function(method, model, options) {
-                // If `this` is a `Backbone.Collection` it means `Backbone.Collection#fetch` has been called
+                // If `this` is a `Backbone.Collection` it means
+                // `Backbone.Collection#fetch` has been called.
                 if (this instanceof Backbone.Collection) {
-                    // If there's no localforageKey for this collection create it
+                    // If there's no localforageKey for this collection, create
+                    // it.
                     if (!this.sync.localforageKey) {
                         this.sync.localforageKey = name;
                     }
-                }
-                // Else it means `this` is a `Backbone.Model`
-                else {
-                    // Generate an id not set yet. Fix this to use `Backbone.Model#idAttribute`.
+                } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
+                    // Generate an id if one is not set yet.
+                    // TODO: Fix this to use `Backbone.Model#idAttribute`.
                     if (!model.id) {
                         model.id = model.attributes.id = guid();
                     }
+
                     // If there's no localforageKey for this model create it
                     if (!model.sync.localforageKey) {
                         model.sync.localforageKey = name + "/" + model.id;
@@ -84,23 +87,30 @@
                         return _this.destroy(model, options);
                 }
             };
-            // This needs to be exposed for later usage
-            sync.localforageNS = name;
+
+            // This needs to be exposed for later usage, but it's private to
+            // the adapter.
+            sync._localforageNamespace = name;
+
             return sync;
         },
 
-        save: function (model, callback) {
+        save: function(model, callback) {
             localforage.setItem(model.sync.localforageKey, model.toJSON(), function(data) {
-                // If `model` has a collection keep the collection in sync as well
+                // If this model has a collection, keep the collection in =
+                // sync as well.
                 if (model.collection) {
                     var collection = model.collection;
-                    // Create an array of `model.collection` models ids
-                    var collectionData = collection.map(function (model) {
-                        return collection.model.prototype.sync.localforageNS + '/' + model.id;
+                    // Create an array of `model.collection` models' ids.
+                    var collectionData = collection.map(function(model) {
+                        return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
                     });
-                    // Bind `data` to `callback` to call after `model.collection` models ids are persisted
+
+                    // Bind `data` to `callback` to call after
+                    // `model.collection` models' ids are persisted.
                     callback = callback ? _.partial(callback, data) : void 0;
-                    // Persist `model.collection` models ids
+
+                    // Persist `model.collection` models' ids.
                     localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
                 } else if (callback) {
                     callback(data);
@@ -109,7 +119,8 @@
         },
 
         create: function(model, callbacks) {
-            // It actually does the same thing since there's always an id to work with
+            // We always have an ID available by this point, so we just call
+            // the update method.
             return this.update(model, callbacks);
         },
 
@@ -136,20 +147,23 @@
         // Only used by `Backbone.Collection#sync`.
         findAll: function(collection, callbacks) {
             localforage.getItem(collection.sync.localforageKey, function(data) {
-                var i, length;
-                if (data && (length = data.length)) {
+                if (data && data.length) {
                     var done = function () {
                         if (callbacks.success) {
                             callbacks.success(data);
                         }
                     };
-                    // Only execute `done` after getting all of the collection's models
-                    done = _.after(length, done);
+
+                    // Only execute `done` after getting all of the
+                    // collection's models.
+                    done = _.after(data.length, done);
+
                     var onModel = function(i, model) {
                         data[i] = model;
                         done();
                     };
-                    for (i = 0; i < length; ++i) {
+
+                    for (var i = 0; i < data.length; ++i) {
                         localforage.getItem(data[i], _.partial(onModel, i));
                     }
                 } else {
