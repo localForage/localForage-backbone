@@ -13,15 +13,15 @@
 // The basics of how to use this library is that it lets you override the
 // `sync` method on your collections and models to use localForage. So
 //
-//     var MyModel = Backbone.Collection.extend({})
-//     var MyCollection = Backbone.Collection.extend({\
+//     var MyModel = Backbone.Model.extend({})
+//     var MyCollection = Backbone.Collection.extend({
 //         model: MyModel
 //     });
 //
 // becomes
 //
 //     var MyModel = Backbone.Collection.extend({
-//         sync: Backbone.localforage.sync()
+//         sync: Backbone.localforage.sync('ModelNamespace')
 //     });
 //     var MyCollection = Backbone.Collection.extend({
 //         model: MyModel,
@@ -41,11 +41,6 @@
   } else
     factory(root.localforage, root.Backbone, root._);
 }(this, function (localforage, Backbone, _) {
-    // Because this library depends on localForage, which includes its own
-    // ES6 Promises polyfill, we can just assume window.Promise is available
-    // and use Promises.
-    var Promise = window.Promise;
-
     function S4() {
         return ((1 + Math.random()) * 65536 | 0).toString(16).substring(1);
     }
@@ -54,210 +49,125 @@
         return S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4();
     }
 
-    var OfflineStore = function(name) {
-        // Initialize data as null so we can test to see if it's been loaded
-        // from our data store later on.
-        this.data = null;
-        this.name = name;
-    };
-
-    _.extend(OfflineStore.prototype, {
-        save: function (callback) {
+    // For now, we aren't complicated: just set a property off Backbone to
+    // serve as our export point.
+    Backbone.localforage = {
+        sync: function(name) {
             var _this = this;
-            return new Promise(function(resolve, reject) {
-                localforage.setItem(_this.name, JSON.stringify(_this.data), function(data) {
-                    if (callback) {
-                        callback(data);
+            var sync = function(method, model, options) {
+                // If `this` is a `Backbone.Collection` it means `Backbone.Collection#fetch` has been called
+                if (this instanceof Backbone.Collection) {
+                    // If there's no localforageKey for this collection create it
+                    if (!this.sync.localforageKey) {
+                        this.sync.localforageKey = name;
                     }
-
-                    resolve(data);
-                });
-            });
+                }
+                // Else it means `this` is a `Backbone.Model`
+                else {
+                    // Generate an id not set yet. Fix this to use `Backbone.Model#idAttribute`.
+                    if (!model.id) {
+                        model.id = model.attributes.id = guid();
+                    }
+                    // If there's no localforageKey for this model create it
+                    if (!model.sync.localforageKey) {
+                        model.sync.localforageKey = name + "/" + model.id;
+                    }
+                }
+                switch (method) {
+                    case "read":
+                        return model.id ? _this.find(model, options) : _this.findAll(model, options);
+                    case "create":
+                        return _this.create(model, options);
+                    case "update":
+                        return _this.update(model, options);
+                    case "delete":
+                        return _this.destroy(model, options);
+                }
+            };
+            // This needs to be exposed for later usage
+            sync.localforageNS = name;
+            return sync;
         },
 
-        create: function(model, callbacks) {
-            var _this = this;
-            return new Promise(function(resolve, reject) {
-                if (_this.data) {
-                    if (!model.id) model.id = model.attributes.id = guid();
-                    _this.data[model.id] = model.toJSON();
-                    _this.save(function() {
-                        if (callbacks.success) {
-                            callbacks.success(_this.data[model.id]);
-                        }
-
-                        resolve(_this.data[model.id]);
+        save: function (model, callback) {
+            localforage.setItem(model.sync.localforageKey, model.toJSON(), function(data) {
+                // If `model` has a collection keep the collection in sync as well
+                if (model.collection) {
+                    var collection = model.collection;
+                    // Create an array of `model.collection` models ids
+                    var collectionData = collection.map(function (model) {
+                        return collection.model.prototype.sync.localforageNS + '/' + model.id;
                     });
-                } else {
-                    localforage.getItem(_this.name, function(data) {
-                        _this.data = JSON.parse(data) || {};
-
-                        if (!model.id) model.id = model.attributes.id = guid();
-                        _this.data[model.id] = model.toJSON();
-                        _this.save(function() {
-                            if (callbacks.success) {
-                                callbacks.success(_this.data[model.id]);
-                            }
-
-                            resolve(_this.data[model.id]);
-                        });
-                    });
+                    // Bind `data` to `callback` to call after `model.collection` models ids are persisted
+                    callback = callback ? _.partial(callback, data) : void 0;
+                    // Persist `model.collection` models ids
+                    localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
+                } else if (callback) {
+                    callback(data);
                 }
             });
         },
 
+        create: function(model, callbacks) {
+            // It actually does the same thing since there's always an id to work with
+            return this.update(model, callbacks);
+        },
+
         update: function(model, callbacks) {
-            var _this = this;
-            return new Promise(function(resolve, reject) {
-                if (_this.data) {
-                    _this.data[model.id] = model.toJSON();
-                    _this.save(function() {
-                        if (callbacks.success) {
-                            callbacks.success(_this.data[model.id]);
-                        }
-
-                        resolve(_this.data[model.id]);
-                    });
-                } else {
-                    localforage.getItem(_this.name, function(data) {
-                        _this.data = JSON.parse(data) || {};
-
-                        _this.data[model.id] = model.toJSON();
-                        _this.save(function() {
-                            if (callbacks.success) {
-                                callbacks.success(_this.data[model.id]);
-                            }
-
-                            resolve(_this.data[model.id]);
-                        });
-                    });
+            this.save(model, function(data) {
+                if (callbacks.success) {
+                    callbacks.success(data);
                 }
             });
         },
 
         find: function(model, callbacks) {
-            var _this = this;
-            return new Promise(function(resolve, reject) {
-                if (_this.data) {
+            localforage.getItem(model.sync.localforageKey, function(data) {
+                if (!_.isEmpty(data)) {
                     if (callbacks.success) {
-                        callbacks.success(_this.data[model.id]);
+                        callbacks.success(data);
                     }
-
-                    resolve(_this.data[model.id]);
-                } else {
-                    localforage.getItem(_this.name, function(data) {
-                        _this.data = JSON.parse(data) || {};
-
-                        if (callbacks.success) {
-                            callbacks.success(_this.data[model.id]);
-                        }
-
-                        resolve(_this.data[model.id]);
-                    });
+                } else if (callbacks.error) {
+                    callbacks.error();
                 }
             });
         },
 
-        findAll: function(callbacks) {
-            var _this = this;
-            return new Promise(function(resolve, reject) {
-                if (_this.data) {
-                    if (callbacks.success) {
-                        callbacks.success(_.values(_this.data));
-                    }
-
-                    resolve(_.values(_this.data));
-                } else {
-                    localforage.getItem(_this.name, function(data) {
-                        _this.data = JSON.parse(data) || {};
+        // Only used by `Backbone.Collection#sync`.
+        findAll: function(collection, callbacks) {
+            localforage.getItem(collection.sync.localforageKey, function(data) {
+                var i, length;
+                if (data && (length = data.length)) {
+                    var done = function () {
                         if (callbacks.success) {
-                            callbacks.success(_.values(_this.data));
+                            callbacks.success(data);
                         }
-
-                        resolve(_.values(_this.data));
-                    });
+                    };
+                    // Only execute `done` after getting all of the collection's models
+                    done = _.after(length, done);
+                    var onModel = function(i, model) {
+                        data[i] = model;
+                        done();
+                    };
+                    for (i = 0; i < length; ++i) {
+                        localforage.getItem(data[i], _.partial(onModel, i));
+                    }
+                } else {
+                    data = [];
+                    if (callbacks.success) {
+                        callbacks.success(data);
+                    }
                 }
             });
         },
 
         destroy: function(model, callbacks) {
-            var _this = this;
-            return new Promise(function(resolve, reject) {
-                if (_this.data) {
-                    delete _this.data[model.id];
-                    _this.save(function() {
-                        if (callbacks.success) {
-                            callbacks.success(model);
-                        }
-
-                        resolve(model);
-                    });
-                } else {
-                    localforage.getItem(__this.name, function(data) {
-                        _this.data = JSON.parse(data) || {};
-
-                        delete _this.data[model.id];
-                        _this.save(function() {
-                            if (callbacks.success) {
-                                callbacks.success(model);
-                            }
-
-                            resolve(model);
-                        });
-                    });
+            localforage.removeItem(model.sync.localforageKey, function() {
+                var json = model.toJSON();
+                if (callbacks.success) {
+                    callbacks.success(json);
                 }
             });
-        }
-    });
-
-    function localforageSync(store, method, model, options) {
-        switch (method) {
-            case "read":
-                return model.id ? store.find(model, options) : store.findAll(options);
-            case "create":
-                return store.create(model, options);
-            case "update":
-                return store.update(model, options);
-            case "delete":
-                return store.destroy(model, options);
-        }
-    }
-
-    // For now, we aren't complicated: just set a property off Backbone to
-    // serve as our export point.
-    Backbone.localforage = {
-        OfflineStore: OfflineStore,
-
-        sync: function(name) {
-            var offlineStore;
-            var sync;
-
-            // If a name's given we create a store for the model or collection;
-            // otherwise we assume it's a model and try to use its collection's
-            // store.
-            if (name) {
-                offlineStore = new OfflineStore(name);
-
-                sync = function(method, model, options) {
-                    return localforageSync.apply(null, [offlineStore].concat([].slice.call(arguments, 0)));
-                };
-
-                sync.offlineStore = offlineStore;
-            } else {
-                sync = function(method, model, options) {
-                    var offlineStore = model.collection && model.collection.sync.offlineStore;
-
-                    if (offlineStore) {
-                        return localforageSync.apply(null, [offlineStore].concat([].slice.call(arguments, 0)));
-                    }
-
-                    // It relies on Backbone.sync if the model isn't in a collection or
-                    // the collection doesn't have a store
-                    return Backbone.sync.apply(this, arguments);
-                };
-            }
-
-            return sync;
         }
     };
 
