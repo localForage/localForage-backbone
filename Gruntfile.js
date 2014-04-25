@@ -37,7 +37,7 @@ module.exports = exports = function(grunt) {
                     vendor: [
                         'bower_components/underscore/underscore.js',
                         'bower_components/backbone/backbone.js',
-                        'bower_components/localforage/localforage.js',
+                        'bower_components/localforage/dist/localforage.js',
                         'dist/localforage.backbone.js'
                     ]
                 }
