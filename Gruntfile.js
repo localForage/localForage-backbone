@@ -13,7 +13,7 @@ module.exports = exports = function(grunt) {
                     banner:
                         '/*!\n' +
                         '    localForage Backbone Adapter\n' +
-                        '    Version 0.3.2\n' +
+                        '    Version 0.4.0\n' +
                         '    https://github.com/mozilla/localforage-backbone\n' +
                         '    (c) 2014 Mozilla, Apache License 2.0\n' +
                         '*/\n'

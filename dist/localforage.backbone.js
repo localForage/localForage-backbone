@@ -1,6 +1,6 @@
 /*!
     localForage Backbone Adapter
-    Version 0.3.1
+    Version 0.4.0
     https://github.com/mozilla/localforage-backbone
     (c) 2014 Mozilla, Apache License 2.0
 */

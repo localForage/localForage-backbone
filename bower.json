@@ -1,6 +1,6 @@
 {
   "name": "localforage-backbone",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "main": [
     "dist/localforage.backbone.min.js"
   ],
@@ -13,7 +13,7 @@
     "vendor/*"
   ],
   "dependencies": {
-    "localforage": "~0.7.0",
+    "localforage": "~0.8.0",
     "backbone": "~1.1.2",
     "underscore": "~1.6.0"
   },
