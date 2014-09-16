@@ -60,9 +60,8 @@
                     }
                 } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
                     // Generate an id if one is not set yet.
-                    // TODO: Fix this to use `Backbone.Model#idAttribute`.
                     if (!model.id) {
-                        model.id = model.attributes.id = guid();
+                        model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
                     }
 
                     // If there's no localforageKey for this model create it
