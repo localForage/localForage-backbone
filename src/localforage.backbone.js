@@ -89,7 +89,7 @@
         },
 
         save: function(model, callback) {
-            localforage.setItem(model.sync.localforageKey, model.toJSON(), function(data) {
+            localforage.setItem(model.sync.localforageKey, model.toJSON(), function(err, data) {
                 // If this model has a collection, keep the collection in =
                 // sync as well.
                 if (model.collection) {
@@ -101,7 +101,7 @@
 
                     // Bind `data` to `callback` to call after
                     // `model.collection` models' ids are persisted.
-                    callback = callback ? _.partial(callback, data) : void 0;
+                    callback = callback ? _.partial(callback, err, data) : void 0;
 
                     // Persist `model.collection` models' ids.
                     localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
@@ -126,8 +126,8 @@
         },
 
         find: function(model, callbacks) {
-            localforage.getItem(model.sync.localforageKey, function(data) {
-                if (!_.isEmpty(data)) {
+            localforage.getItem(model.sync.localforageKey, function(err, data) {
+                if (!err && !_.isEmpty(data)) {
                     if (callbacks.success) {
                         callbacks.success(data);
                     }
@@ -139,8 +139,8 @@
 
         // Only used by `Backbone.Collection#sync`.
         findAll: function(collection, callbacks) {
-            localforage.getItem(collection.sync.localforageKey, function(data) {
-                if (data && data.length) {
+            localforage.getItem(collection.sync.localforageKey, function(err, data) {
+                if (!err && data && data.length) {
                     var done = function () {
                         if (callbacks.success) {
                             callbacks.success(data);
@@ -151,7 +151,7 @@
                     // collection's models.
                     done = _.after(data.length, done);
 
-                    var onModel = function(i, model) {
+                    var onModel = function(i, err, model) {
                         data[i] = model;
                         done();
                     };

@@ -13,7 +13,7 @@
     "vendor/*"
   ],
   "dependencies": {
-    "localforage": "~0.8.0",
+    "localforage": "~1.2.0",
     "backbone": "~1.1.2",
     "underscore": "~1.6.0"
   },
