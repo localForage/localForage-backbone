@@ -127,7 +127,7 @@
 
         find: function(model, callbacks) {
             localforage.getItem(model.sync.localforageKey, function(err, data) {
-                if (!_.isEmpty(data)) {
+                if (!err && !_.isEmpty(data)) {
                     if (callbacks.success) {
                         callbacks.success(data);
                     }
@@ -140,7 +140,7 @@
         // Only used by `Backbone.Collection#sync`.
         findAll: function(collection, callbacks) {
             localforage.getItem(collection.sync.localforageKey, function(err, data) {
-                if (data && data.length) {
+                if (!err && data && data.length) {
                     var done = function () {
                         if (callbacks.success) {
                             callbacks.success(data);
