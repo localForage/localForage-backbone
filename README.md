@@ -20,9 +20,10 @@ models so they're saved to localForage instead of a REST server. Simply
 override your objects' `sync()` method with the namespace for your model:
 
 ```javascript
-    var MyModel = Backbone.Collection.extend({
+    var MyModel = Backbone.Model.extend({
         sync: Backbone.localforage.sync('MyModel')
     });
+
     var MyCollection = Backbone.Collection.extend({
         model: MyModel,
         sync: Backbone.localforage.sync('MyCollection')
