@@ -73,4 +73,35 @@ describe('Backbone.Model', function () {
             });
         });
     });
+
+    describe('test', function () {
+        it('should create distinct key', function (done) {
+            var model1 = new Model();
+            var model2 = new Model();
+
+            var ids = [];
+            // trick to faint asynchronicity of the test
+            var updateTest = function (value) {
+                ids.push(value);
+
+                // mark test as complete
+                if (ids.length > 1) {
+                    expect(ids[0]).not.toEqual(ids[1]);
+                    done();
+                }
+            };
+
+            model1.fetch({
+                error: function () {
+                    updateTest(model1.id);
+                }
+            });
+
+            model2.fetch({
+                error: function () {
+                    updateTest(model2.id);
+                }
+            });
+        })
+    });
 });
