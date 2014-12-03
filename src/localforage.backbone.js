@@ -55,8 +55,8 @@
                 if (this instanceof Backbone.Collection) {
                     // If there's no localforageKey for this collection, create
                     // it.
-                    if (!this.sync.localforageKey) {
-                        this.sync.localforageKey = name;
+                    if (!this.localforageKey) {
+                        this.localforageKey = name;
                     }
                 } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
                     // Generate an id if one is not set yet.
@@ -64,9 +64,9 @@
                         model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
                     }
 
-                    // If there's no localforageKey for this model create it
-                    if (!model.sync.localforageKey) {
-                        model.sync.localforageKey = name + "/" + model.id;
+                    // add a localforageKey for this model
+                    if (!this.localforageKey) {
+                      this.localforageKey = name + "/" + this.id;
                     }
                 }
                 switch (method) {
@@ -89,7 +89,7 @@
         },
 
         save: function(model, callback) {
-            localforage.setItem(model.sync.localforageKey, model.toJSON(), function(err, data) {
+            localforage.setItem(model.localforageKey, model.toJSON(), function(err, data) {
                 // If this model has a collection, keep the collection in =
                 // sync as well.
                 if (model.collection) {
@@ -104,7 +104,7 @@
                     callback = callback ? _.partial(callback, err, data) : void 0;
 
                     // Persist `model.collection` models' ids.
-                    localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
+                    localforage.setItem(model.collection.localforageKey, collectionData, callback);
                 } else if (callback) {
                     callback(data);
                 }
@@ -126,7 +126,7 @@
         },
 
         find: function(model, callbacks) {
-            localforage.getItem(model.sync.localforageKey, function(err, data) {
+            localforage.getItem(model.localforageKey, function(err, data) {
                 if (!err && !_.isEmpty(data)) {
                     if (callbacks.success) {
                         callbacks.success(data);
@@ -139,7 +139,7 @@
 
         // Only used by `Backbone.Collection#sync`.
         findAll: function(collection, callbacks) {
-            localforage.getItem(collection.sync.localforageKey, function(err, data) {
+            localforage.getItem(collection.localforageKey, function(err, data) {
                 if (!err && data && data.length) {
                     var done = function () {
                         if (callbacks.success) {
@@ -169,7 +169,7 @@
         },
 
         destroy: function(model, callbacks) {
-            localforage.removeItem(model.sync.localforageKey, function() {
+            localforage.removeItem(model.localforageKey, function() {
                 var json = model.toJSON();
                 if (callbacks.success) {
                     callbacks.success(json);
