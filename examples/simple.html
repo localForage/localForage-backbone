@@ -15,9 +15,13 @@
             <input type="text" name="content" />
             <input type="submit" value="Create" />
         </form>
+        <ul class="list"></ul>
+    </script>
+    <script type="template/form" id="itemtpl">
+        <p><%= content %></p>
     </script>
     <script>
-      (function (Backbone, _) {
+      (function (Backbone, $, _) {
           'use strict';
 
           // Set driver (optional, but we use localforage here so developers
@@ -39,20 +43,20 @@
                   'submit form': 'handleSaveModel'
               },
 
-              initialize: function (options) {
+              initialize: function () {
                   // For the sake of the example, this is very bad
                   // performance-wise :)
-                  this.listenTo(this.collection, 'add remove change sync', this.render);
+                  this.listenTo(this.collection, 'add', this.addItemView);
+                  this.listenTo(this.collection, 'remove change', this.render);
               },
 
-              createModel: function (model) {
-                  return $("<div>", {
-                      'class': 'saved-data',
-                      text: model.get('content')
-                  });
+              addItemView: function (model) {
+                  var itemView = new ItemView({model: model});
+                  this.$list.append(itemView.render().el);
               },
 
               handleSaveModel: function (event) {
+                  debugger;
                   event.preventDefault();
                   // It'll write on the localforage offline store
                   this.collection.create({content: this.$('[name="content"]').val()});
@@ -61,9 +65,24 @@
               render: function () {
                   // Render the form template on this.$el and append the
                   // collection content
-                  this.$el
-                      .html(_.template($('#formtpl').html()))
-                      .append(this.collection.map(this.createModel));
+                  this.$el.html(_.template($('#formtpl').html()));
+
+                  // cache DOM list container
+                  this.$list = $(this.$el.find('.list')[0]);
+                  return this;
+              }
+          });
+
+          var ItemView = Backbone.View.extend({
+              tagName: 'li',
+              className: 'list--item',
+              template: _.template($('#itemtpl').html()),
+
+              render: function () {
+                  this.$el.html(this.template({
+                      content: this.model.get('content')
+                  }));
+                  return this;
               }
           });
 
@@ -76,7 +95,7 @@
 
           myFormView.render();
           collectionInstance.fetch();
-      }(this.Backbone, this._));
+      }(this.Backbone, this.$, this._));
     </script>
   </body>
 </html>
