@@ -4,6 +4,12 @@ module.exports = exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json');
 
+    var sourceFiles = [
+        'Gruntfile.js',
+        'src/*.js',
+        'test/*.js'
+    ];
+
     grunt.initConfig({
         concat: {
             options: {
@@ -54,13 +60,22 @@ module.exports = exports = function(grunt) {
                 files: 'test/**/*.js',
                 tasks: ['jasmine']
             }
-        }
+        },
+        jscs: {
+            source: sourceFiles
+        },
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            source: sourceFiles
+        },
     });
 
-    require('load-grunt-tasks')(grunt, {pattern: 'grunt-contrib-*'});
+    require('load-grunt-tasks')(grunt, {pattern: 'grunt-*'});
 
     grunt.registerTask('default', ['build', 'watch']);
-    grunt.registerTask('build', ['concat', 'uglify']);
+    grunt.registerTask('build', ['jshint', 'jscs', 'concat', 'uglify']);
 
     grunt.registerTask('test', ['build', 'jasmine']);
 };
