@@ -47,6 +47,8 @@
     // For now, we aren't complicated: just set a property off Backbone to
     // serve as our export point.
     Backbone.localforage = {
+        localforageInstance: localforage,
+
         sync: function(name) {
             var _this = this;
             var sync = function(method, model, options) {
