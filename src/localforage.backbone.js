@@ -55,21 +55,14 @@
                 // If `this` is a `Backbone.Collection` it means
                 // `Backbone.Collection#fetch` has been called.
                 if (this instanceof Backbone.Collection) {
-                    // If there's no localforageKey for this collection, create
-                    // it.
-                    if (!this.sync.localforageKey) {
-                        this.sync.localforageKey = name;
-                    }
+                    model.sync.localforageKey = name;
                 } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
                     // Generate an id if one is not set yet.
                     if (!model.id) {
                         model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
                     }
 
-                    // If there's no localforageKey for this model create it
-                    if (!model.sync.localforageKey) {
-                        model.sync.localforageKey = name + "/" + model.id;
-                    }
+                    model.sync.localforageKey = name + "/" + model.id;
                 }
                 switch (method) {
                     case "read":
