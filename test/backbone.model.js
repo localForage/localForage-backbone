@@ -63,12 +63,25 @@ describe('Backbone.Model', function () {
 
         it('removes from localForage', function(done) {
             model.destroy({
-                success: function() {
-                    model.fetch({
+                success: function(model, resp, options) {
+                    expect(model.attributes).toEqual(resp);
+                    var handlers = {
+                      success: function () {
+                        testComplete();
+                      },
                       error: function () {
-                        done();
+                        testComplete();
                       }
-                    });
+                    };
+                    spyOn(handlers, 'success').and.callThrough();
+                    spyOn(handlers, 'error').and.callThrough();
+
+                    var testComplete = function () {
+                      expect(handlers.error).toHaveBeenCalled();
+                      expect(handlers.success).not.toHaveBeenCalled();
+                      done();
+                    }
+                    model.fetch(handlers);
                 }
             });
         });
