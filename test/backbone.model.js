@@ -1,12 +1,12 @@
 /*global Backbone, beforeEach:true, describe:true, expect:true, it:true */
-describe('Backbone.Model', function () {
+describe('Backbone.Model', function() {
   'use strict';
 
     var Model = Backbone.Model.extend({
       sync: Backbone.localforage.sync('ModelNamespace')
     });
 
-    describe('Model flow', function () {
+    describe('Model flow', function() {
         var model;
         var id;
 
@@ -39,7 +39,7 @@ describe('Backbone.Model', function () {
 
         it('fetches from localForage', function(done) {
             model.fetch({
-                success: function () {
+                success: function() {
                     expect(model).toBeDefined();
                     expect(model.attributes).toEqual({
                         id: id,
@@ -63,24 +63,25 @@ describe('Backbone.Model', function () {
 
         it('removes from localForage', function(done) {
             model.destroy({
-                success: function(model, resp, options) {
+                success: function(model, resp, options) { // jshint unused:false
                     expect(model.attributes).toEqual(resp);
                     var handlers = {
-                      success: function () {
+                      success: function() {
                         testComplete();
                       },
-                      error: function () {
+                      error: function() {
                         testComplete();
                       }
                     };
                     spyOn(handlers, 'success').and.callThrough();
                     spyOn(handlers, 'error').and.callThrough();
 
-                    var testComplete = function () {
+                    var testComplete = function() {
                       expect(handlers.error).toHaveBeenCalled();
                       expect(handlers.success).not.toHaveBeenCalled();
                       done();
-                    }
+                    };
+
                     model.fetch(handlers);
                 }
             });

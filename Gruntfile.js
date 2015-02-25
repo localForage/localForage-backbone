@@ -13,7 +13,7 @@ module.exports = exports = function(grunt) {
     grunt.initConfig({
         concat: {
             options: {
-                separator: '',
+                separator: ''
             },
             backbone: {
                 dest: 'dist/localforage.backbone.js',
@@ -69,7 +69,7 @@ module.exports = exports = function(grunt) {
                 jshintrc: '.jshintrc'
             },
             source: sourceFiles
-        },
+        }
     });
 
     require('load-grunt-tasks')(grunt, {pattern: 'grunt-*'});

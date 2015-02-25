@@ -38,7 +38,7 @@ describe('Backbone.Collection', function() {
 
     it('fetches from localForage', function(done) {
         collection.fetch({
-            success: function () {
+            success: function() {
                 expect(collection.length).toEqual(1);
 
                 var model = collection.get(id);
