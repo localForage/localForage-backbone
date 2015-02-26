@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Jasmine Spec Runner v2.1.3</title>
+
+  <link rel="shortcut icon" type="image/png" href="node_modules/jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine_favicon.png">
+  <link rel="stylesheet" href="node_modules/jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+
+  <script src="node_modules/jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+  <script src="node_modules/jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="node_modules/jasmine/node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
+
+  <!-- include source files here... -->
+  <script src="bower_components/underscore/underscore.js"></script>
+  <script src="bower_components/backbone/backbone.js"></script>
+  <script src="bower_components/localforage/dist/localforage.js"></script>
+  <script src="src/localforage.backbone.js"></script>
+
+  <script>
+      // set database name for tests
+      // it may conflict with example database if you open both in the same browser
+      // as they will have the localforage name by default.
+      Backbone.localforage.localforageInstance.config({
+          driver: localforage.LOCALSTORAGE,
+          name: 'test'
+      });
+  </script>
+
+  <!-- include spec files here... -->
+  <script src="test/backbone.model.js"></script>
+  <script src="test/backbone.collection.js"></script>
+
+</head>
+
+<body>
+</body>
+</html>

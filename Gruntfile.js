@@ -4,10 +4,16 @@ module.exports = exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json');
 
+    var sourceFiles = [
+        'Gruntfile.js',
+        'src/*.js',
+        'test/*.js'
+    ];
+
     grunt.initConfig({
         concat: {
             options: {
-                separator: '',
+                separator: ''
             },
             backbone: {
                 dest: 'dist/localforage.backbone.js',
@@ -48,22 +54,28 @@ module.exports = exports = function(grunt) {
         watch: {
             src: {
                 files: 'src/**/*.js',
-                tasks: ['test']
+                tasks: ['jshint', 'jscs', 'test']
             },
             test: {
                 files: 'test/**/*.js',
-                tasks: ['jasmine']
+                tasks: ['jshint', 'jscs', 'jasmine']
             }
+        },
+        jscs: {
+            source: sourceFiles
+        },
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            source: sourceFiles
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
+    require('load-grunt-tasks')(grunt, {pattern: 'grunt-*'});
 
     grunt.registerTask('default', ['build', 'watch']);
-    grunt.registerTask('build', ['concat', 'uglify']);
+    grunt.registerTask('build', ['jshint', 'jscs', 'concat', 'uglify']);
 
     grunt.registerTask('test', ['build', 'jasmine']);
 };
