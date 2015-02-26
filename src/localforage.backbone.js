@@ -60,11 +60,26 @@
             callback = callback ? _.partial(callback, err, data) : void 0;
 
             if (!collection.sync.localforageKey) {
-                collection.sync.localforageKey = collection.sync._localforageNamespace;
+                localforageKey(collection);
             }
 
             // Persist `model.collection` models' ids.
             localforage.setItem(collection.sync.localforageKey, collectionData, callback);
+        }
+    }
+
+    function localforageKey(model) {
+        // If `this` is a `Backbone.Collection` it means
+        // `Backbone.Collection#fetch` has been called.
+        if (model instanceof Backbone.Collection) {
+            model.sync.localforageKey = model.sync._localforageNamespace;
+        } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
+            // Generate an id if one is not set yet.
+            if (!model.id) {
+                model[model.idAttribute] = model.attributes[model.idAttribute] = guid();
+            }
+
+            model.sync.localforageKey = model.sync._localforageNamespace + '/' + model.id;
         }
     }
 
@@ -76,18 +91,8 @@
         sync: function(name) {
             var self = this;
             var sync = function(method, model, options) {
-                // If `this` is a `Backbone.Collection` it means
-                // `Backbone.Collection#fetch` has been called.
-                if (this instanceof Backbone.Collection) {
-                    model.sync.localforageKey = name;
-                } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
-                    // Generate an id if one is not set yet.
-                    if (!model.id) {
-                        model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
-                    }
-
-                    model.sync.localforageKey = name + '/' + model.id;
-                }
+                localforageKey(model);
+                
                 switch (method) {
                     case 'read':
                         return model.id ? self.find(model, options) : self.findAll(model, options);
