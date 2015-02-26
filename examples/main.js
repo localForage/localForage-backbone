@@ -54,7 +54,6 @@
       initialize: function () {
           this.listenTo(this.collection, 'add', this.addItemView);
           this.listenTo(this.collection, 'remove', this.removeItem);
-          this.listenTo(this.collection, 'sync', this.render);
           this._itemsView = {};
       },
 
@@ -68,6 +67,11 @@
           this._itemsView[model.id].remove();
           this._itemsView[model.id] = null;
           delete this._itemsView[model.id];
+      },
+
+      render: function () {
+          this.collection.map(this.addItemView);
+          return this;
       }
     });
 
