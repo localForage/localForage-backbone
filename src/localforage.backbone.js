@@ -96,6 +96,10 @@
                         return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
                     });
 
+                    if (!model.collection.sync.localforageKey){
+                        model.collection.sync.localforageKey = model.collection.sync._localforageNamespace
+                    }
+
                     // Bind `data` to `callback` to call after
                     // `model.collection` models' ids are persisted.
                     callback = callback ? _.partial(callback, err, data) : void 0;
