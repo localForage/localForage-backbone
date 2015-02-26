@@ -11,12 +11,12 @@
 
     <script type="template/form" id="formtpl">
         <form>
-            <button class="btn btn-rounded btn-nav pull-left" data-action="clear">
+            <a class="btn btn-rounded btn-nav pull-left" data-action="clear">
               <span class="icon icon-trash"></span>
-            </button>
-            <button class="btn btn-rounded btn-nav pull-left" data-action="refresh">
+            </a>
+            <a class="btn btn-rounded btn-nav pull-left" data-action="refresh">
               <span class="icon icon-refresh"></span>
-            </button>
+            </a>
             <button class="btn btn-rounded btn-nav pull-right" data-action="add">
               <span class="icon icon-plus"></span>
             </button>
@@ -89,6 +89,10 @@
             top: 0;
         }
 
+        .bar a.btn .icon {
+            top: 6px;
+        }
+        
         .table-view-cell {
             padding-right: 15px;
         }

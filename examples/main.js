@@ -18,9 +18,15 @@
     var FormView = Backbone.View.extend({
         template: _.template($('#formtpl').html()),
         events: {
+            'submit form': 'submit',
             'click [data-action="add"]': 'addItem',
             'click [data-action="refresh"]': 'refresh',
             'click [data-action="clear"]': 'clear'
+        },
+
+        submit: function(event) {
+            event.preventDefault();
+            this.addItem(event);
         },
 
         addItem: function(event) {
