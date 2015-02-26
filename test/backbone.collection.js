@@ -65,12 +65,20 @@ describe('Backbone.Collection', function() {
     });
 
     it('removes from localForage', function(done) {
-        collection.get(id).destroy({
-            success: function() {
-                expect(collection.length).toEqual(0);
+        localforage.getItem(collection.sync.localforageKey, function(err, values) {
+            collection.get(id).destroy({
+                success: function() {
+                    expect(collection.length).toEqual(0);
 
-                done();
-            }
+                    // expect collection references to be reset
+                    localforage.getItem(collection.sync.localforageKey, function(err, values2) {
+                        expect(values2.length).toEqual(values.length - 1);
+
+                        // test complete
+                        done();
+                    });
+                }
+            });
         });
     });
 });
