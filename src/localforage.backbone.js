@@ -96,7 +96,7 @@
                         return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
                     });
 
-                    if (!model.collection.sync.localforageKey){
+                    if (!model.collection.sync.localforageKey) {
                         model.collection.sync.localforageKey = model.collection.sync._localforageNamespace;
                     }
 
