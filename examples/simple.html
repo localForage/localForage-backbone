@@ -11,7 +11,7 @@
 
     <script type="template/form" id="formtpl">
         <form>
-            <button class="btn btn-rounded btn-nav pull-right" data-action="refresh">
+            <button class="btn btn-rounded btn-nav pull-left" data-action="refresh">
               <span class="icon icon-refresh"></span>
             </button>
             <button class="btn btn-rounded btn-nav pull-right" data-action="add">
@@ -24,9 +24,14 @@
     </script>
     <script type="template/form" id="itemtpl">
         <%= content %>
-        <button class="btn btn-rounded" data-action="delete">
-            <span class="icon icon-close"></span>
-        </button>
+        <div class="pull-right">
+            <button class="btn btn-rounded" data-action="edit">
+                <span class="icon icon-edit"></span>
+            </button>
+            <button class="btn btn-rounded" data-action="delete">
+                <span class="icon icon-close"></span>
+            </button>
+        </div>
     </script>
 
     <link rel="stylesheet" href="../bower_components/ratchet/dist/css/ratchet.css"></link>
@@ -63,6 +68,10 @@
         .bar .btn-rounded .icon {
             font-size: 15px;
             top: 0;
+        }
+
+        .table-view-cell {
+            padding-right: 15px;
         }
     </style>
   </head>

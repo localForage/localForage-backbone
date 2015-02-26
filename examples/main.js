@@ -24,11 +24,33 @@
 
         addItem: function (event) {
             event.preventDefault();
+
+            var attrs = {
+                content: this.$input.val()
+            };
+
             // It'll write on the localforage offline store
-            this.collection.create({content: this.$input.val()});
+            if (this.model) {
+                this.model.save(attrs);
+                this.updateSaveIcon();
+            }
+            else {
+                this.collection.create(attrs);
+            }
 
             // clear form input
             this.$input.val('');
+
+            // remove reference to edited model
+            this.model = null;
+        },
+
+        editItem: function (model) {
+            this.$input.val(model.get('content'));
+            this.updateSaveIcon();
+
+            // keep reference to current model edited
+            this.model = model;
         },
 
         render: function () {
@@ -38,12 +60,17 @@
 
             // cache DOM list container
             this.$input = this.$('[name="content"]');
+            this.$addButtonIcon = this.$('[data-action="add"] > .icon');
             return this;
         },
 
         refresh: function (event) {
             event.preventDefault();
             collection.fetch({reset: true});
+        },
+
+        updateSaveIcon: function () {
+            this.$addButtonIcon.toggleClass('icon-plus').toggleClass('icon-download');
         }
     });
 
@@ -81,7 +108,12 @@
         className: 'table-view-cell',
 
         events: {
-            'click [data-action="delete"]': 'deleteItem'
+            'click [data-action="delete"]': 'deleteItem',
+            'click [data-action="edit"]': 'editItem'
+        },
+
+        initialize: function () {
+            this.listenTo(this.model, 'change', this.render);
         },
 
         render: function () {
@@ -94,6 +126,11 @@
         deleteItem: function (event) {
             event.preventDefault();
             this.model.destroy();
+        },
+
+        editItem: function (event) {
+            event.preventDefault();
+            formView.editItem(this.model);
         }
     });
 
