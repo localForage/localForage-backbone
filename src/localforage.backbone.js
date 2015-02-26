@@ -92,7 +92,7 @@
             var self = this;
             var sync = function(method, model, options) {
                 localforageKey(model);
-                
+
                 switch (method) {
                     case 'read':
                         return model.id ? self.find(model, options) : self.findAll(model, options);
@@ -108,6 +108,10 @@
             // This needs to be exposed for later usage, but it's private to
             // the adapter.
             sync._localforageNamespace = name;
+
+            // expose function used to create the localeForage key
+            // this enable to have the key set before sync is called
+            sync._localeForageKeyFn = localforageKey;
 
             return sync;
         },
