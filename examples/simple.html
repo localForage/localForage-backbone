@@ -30,15 +30,16 @@
 
           // We store offline data inside a collection. This is how we tell
           // a model/collection to store data offline with localForage.
-          var MyCollection = Backbone.Collection.extend({
-              sync: Backbone.localforage.sync('MyCollection'),
+          var ListCollection = Backbone.Collection.extend({
+              sync: Backbone.localforage.sync('list'),
               model: Backbone.Model.extend({
-                  sync: Backbone.localforage.sync('ModelNamespace')
+                  sync: Backbone.localforage.sync('item')
               })
           });
 
           // A view with a form and the collection contents
-          var MyFormView = Backbone.View.extend({
+          var FormView = Backbone.View.extend({
+              template: _.template($('#formtpl').html()),
               events: {
                   'submit form': 'handleSaveModel'
               },
@@ -56,16 +57,18 @@
               },
 
               handleSaveModel: function (event) {
-                  debugger;
                   event.preventDefault();
                   // It'll write on the localforage offline store
                   this.collection.create({content: this.$input.val()});
+
+                  // clear form input
+                  this.$input.val('');
               },
 
               render: function () {
                   // Render the form template on this.$el and append the
                   // collection content
-                  this.$el.html(_.template($('#formtpl').html()));
+                  this.$el.html(this.template());
 
                   // cache DOM list container
                   this.$list = this.$('.list');
@@ -88,14 +91,14 @@
           });
 
           // Instancing the collection and the view
-          var collectionInstance = new MyCollection();
-          var myFormView = new MyFormView({
+          var collection = new ListCollection();
+          var formView = new FormView({
               el: $('<div>', {'class': 'content'}).appendTo(document.body),
-              collection: collectionInstance
+              collection: collection
           });
 
-          myFormView.render();
-          collectionInstance.fetch();
+          formView.render();
+          collection.fetch();
       }(this.Backbone, this.$, this._));
     </script>
   </body>
