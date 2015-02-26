@@ -33,6 +33,27 @@ override your objects' `sync()` method with the namespace for your model:
 Now whenever you save your collections or models, they'll be saved with
 localForage!
 
+
+## Warning
+
+This library is only about overriding `Backbone.sync`, which means that calling `collection.remove(model)` won't update the offline storage.
+
+The `Backbone.Collection.remove` function is only about removing a model from a collection, to clean up all references and event listeners, but does not involve a `sync` operation.
+
+If you want to destroy a model, you should use this code instead:
+
+```javascript
+// retrieve a model by its id and destroy it
+collection.get(id).destroy();
+
+// or
+
+// retrieve a model by its index in the collection and destroy it
+collection.at(index).destroy();
+```
+
+
+
 # License
 
 This program is free software; it is distributed under an
