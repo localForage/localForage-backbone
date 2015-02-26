@@ -43,7 +43,7 @@
 
         refresh: function (event) {
             event.preventDefault();
-            collection.fetch();
+            collection.fetch({reset: true});
         }
     });
 
