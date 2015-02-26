@@ -61,11 +61,20 @@
         tagName: 'li',
         className: 'table-view-cell',
 
+        events: {
+            'click [data-action="delete"]': 'deleteItem'
+        },
+
         render: function () {
             this.$el.html(this.template({
                 content: this.model.get('content')
             }));
             return this;
+        },
+
+        deleteItem: function (event) {
+            event.preventDefault();
+            this.model.destroy();
         }
     });
 
