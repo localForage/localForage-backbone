@@ -47,12 +47,21 @@
 
       initialize: function () {
           this.listenTo(this.collection, 'add', this.addItemView);
-          this.listenTo(this.collection, 'remove change', this.render);
+          this.listenTo(this.collection, 'remove', this.removeItem);
+          this.listenTo(this.collection, 'change', this.render);
+          this._itemsView = {};
       },
 
       addItemView: function (model) {
           var itemView = new ItemView({model: model});
           this.$el.append(itemView.render().el);
+          this._itemsView[model.id] = itemView;
+      },
+
+      removeItem: function (model) {
+          this._itemsView[model.id].remove();
+          this._itemsView[model.id] = null;
+          delete this._itemsView[model.id];
       }
     });
 
