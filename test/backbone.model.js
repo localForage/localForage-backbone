@@ -1,9 +1,9 @@
 /*global Backbone, beforeEach:true, describe:true, expect:true, it:true */
 describe('Backbone.Model', function() {
-  'use strict';
+    'use strict';
 
     var Model = Backbone.Model.extend({
-      sync: Backbone.localforage.sync('ModelNamespace')
+        sync: Backbone.localforage.sync('ModelNamespace')
     });
 
     describe('Model flow', function() {
@@ -13,13 +13,13 @@ describe('Backbone.Model', function() {
         beforeEach(function(done) {
             model = new Model();
             if (id) {
-              model.set('id', id).fetch({
-                success: function() {
-                  done();
-                }
-              });
+                model.set('id', id).fetch({
+                    success: function() {
+                        done();
+                    }
+                });
             } else {
-              done();
+                done();
             }
         });
 
@@ -66,20 +66,20 @@ describe('Backbone.Model', function() {
                 success: function(model, resp, options) { // jshint unused:false
                     expect(model.attributes).toEqual(resp);
                     var handlers = {
-                      success: function() {
-                        testComplete();
-                      },
-                      error: function() {
-                        testComplete();
-                      }
+                        success: function() {
+                            testComplete();
+                        },
+                        error: function() {
+                            testComplete();
+                        }
                     };
                     spyOn(handlers, 'success').and.callThrough();
                     spyOn(handlers, 'error').and.callThrough();
 
                     var testComplete = function() {
-                      expect(handlers.error).toHaveBeenCalled();
-                      expect(handlers.success).not.toHaveBeenCalled();
-                      done();
+                        expect(handlers.error).toHaveBeenCalled();
+                        expect(handlers.success).not.toHaveBeenCalled();
+                        done();
                     };
 
                     model.fetch(handlers);
