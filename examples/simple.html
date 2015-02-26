@@ -34,6 +34,21 @@
         </div>
     </script>
 
+    <script type="template/form" id="footertpl">
+        <a class="tab-item" data-item="LOCALSTORAGE">
+            <span class="icon"></span>
+            <span class="tab-label">Local Storage</span>
+        </a>
+        <a class="tab-item" data-item="WEBSQL">
+            <span class="icon"></span>
+            <span class="tab-label">WebSql</span>
+        </a>
+        <a class="tab-item" data-item="INDEXEDDB">
+            <span class="icon"></span>
+            <span class="tab-label">IndexedDB</span>
+        </a>
+    </script>
+
     <link rel="stylesheet" href="../bower_components/ratchet/dist/css/ratchet.css"></link>
     <style>
         .bar .btn, input[type=text] {
@@ -73,12 +88,25 @@
         .table-view-cell {
             padding-right: 15px;
         }
+
+        .tab-item .icon-check {
+            color: #5cb85c;
+        }
+
+        .tab-item .icon-close {
+            color: #d9534f;
+        }
+
+        .tab-item.active {
+            background-color: rgba(0,0,0,.15);
+        }
     </style>
   </head>
   <body>
     <div class="container">
       <header class="bar bar-nav"></header>
       <div class="content"></div>
+      <footer class="bar bar-tab"></footer>
     </div>
 
     <script src="./main.js"></script>
