@@ -19,7 +19,8 @@
         template: _.template($('#formtpl').html()),
         events: {
             'click [data-action="add"]': 'addItem',
-            'click [data-action="refresh"]': 'refresh'
+            'click [data-action="refresh"]': 'refresh',
+            'click [data-action="clear"]': 'clear'
         },
 
         addItem: function(event) {
@@ -67,6 +68,10 @@
         refresh: function(event) {
             event.preventDefault();
             refreshCollection();
+        },
+
+        clear: function() {
+            clearCollection();
         },
 
         updateSaveIcon: function() {
@@ -200,6 +205,11 @@
     var refreshCollection = function() {
         collection.reset(); // clear collection before
         collection.fetch();
+    };
+
+    var clearCollection = function() {
+        collection.reset();
+        localforage.clear();
     };
 
     var formView = new FormView({

@@ -11,6 +11,9 @@
 
     <script type="template/form" id="formtpl">
         <form>
+            <button class="btn btn-rounded btn-nav pull-left" data-action="clear">
+              <span class="icon icon-trash"></span>
+            </button>
             <button class="btn btn-rounded btn-nav pull-left" data-action="refresh">
               <span class="icon icon-refresh"></span>
             </button>
@@ -28,7 +31,7 @@
                 <span class="icon icon-edit"></span>
             </button>
             <button class="btn btn-rounded" data-action="delete">
-                <span class="icon icon-close"></span>
+                <span class="icon icon-trash"></span>
             </button>
         </div>
         <p class="item-content"><%= content %></p>
