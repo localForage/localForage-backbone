@@ -1,4 +1,4 @@
-(function (Backbone, $, _) {
+(function(Backbone, $, _) {
     'use strict';
 
     // Set driver (optional, but we use localforage here so developers
@@ -22,7 +22,7 @@
             'click [data-action="refresh"]': 'refresh'
         },
 
-        addItem: function (event) {
+        addItem: function(event) {
             event.preventDefault();
 
             var attrs = {
@@ -45,7 +45,7 @@
             this.model = null;
         },
 
-        editItem: function (model) {
+        editItem: function(model) {
             this.$input.val(model.get('content'));
             this.updateSaveIcon();
 
@@ -53,7 +53,7 @@
             this.model = model;
         },
 
-        render: function () {
+        render: function() {
             // Render the form template on this.$el and append the
             // collection content
             this.$el.html(this.template());
@@ -64,12 +64,12 @@
             return this;
         },
 
-        refresh: function (event) {
+        refresh: function(event) {
             event.preventDefault();
             refreshCollection();
         },
 
-        updateSaveIcon: function () {
+        updateSaveIcon: function() {
             this.$addButtonIcon.toggleClass('icon-plus').toggleClass('icon-download');
         }
     });
@@ -78,30 +78,30 @@
       tagName: 'ul',
       className: 'table-view',
 
-      initialize: function () {
+      initialize: function() {
           this.listenTo(this.collection, 'add', this.addItemView);
           this.listenTo(this.collection, 'remove', this.removeItem);
           this.listenTo(this.collection, 'reset', this.reset);
           this._itemsView = {};
       },
 
-      addItemView: function (model) {
+      addItemView: function(model) {
           var itemView = new ItemView({model: model});
           this.$el.append(itemView.render().el);
           this._itemsView[model.id] = itemView;
       },
 
-      removeItem: function (model) {
+      removeItem: function(model) {
           this._itemsView[model.id].remove();
           this._itemsView[model.id] = null;
           delete this._itemsView[model.id];
       },
 
-      reset: function (model, options) {
-        options.previousModels.map(this.removeItem, this);
+      reset: function(model, options) {
+          options.previousModels.map(this.removeItem, this);
       },
 
-      render: function () {
+      render: function() {
           this.collection.map(this.addItemView, this);
           return this;
       }
@@ -117,11 +117,11 @@
             'click [data-action="edit"]': 'editItem'
         },
 
-        initialize: function () {
+        initialize: function() {
             this.listenTo(this.model, 'change', this.render);
         },
 
-        render: function () {
+        render: function() {
             // build the model localeForage key only for debug purpose
             // at this point this key might not have been set if no sync
             // operation has been made
@@ -134,12 +134,12 @@
             return this;
         },
 
-        deleteItem: function (event) {
+        deleteItem: function(event) {
             event.preventDefault();
             this.model.destroy();
         },
 
-        editItem: function (event) {
+        editItem: function(event) {
             event.preventDefault();
             formView.editItem(this.model);
         }
@@ -158,36 +158,36 @@
             'click .tab-item': 'onTabItemChange'
         },
 
-        render: function () {
+        render: function() {
             this.$el.html(this.template());
             this.showSupport();
             this.showActiveDriver();
         },
 
-        showSupport: function () {
+        showSupport: function() {
             drivers.map(_.bind(this.updateDriverIcon, this));
         },
 
-        showActiveDriver: function () {
+        showActiveDriver: function() {
             drivers.map(_.bind(this.updateDriverTabItem, this));
         },
 
-        updateDriverTabItem: function (driverName) {
-            var method = localforage.driver() === localforage[driverName] ? $.fn.addClass: $.fn.removeClass;
+        updateDriverTabItem: function(driverName) {
+            var method = localforage.driver() === localforage[driverName] ? $.fn.addClass : $.fn.removeClass;
             var $el = this.$('[data-item=' + driverName + ']');
             method.call($el, 'active');
         },
 
-        updateDriverIcon: function (driverName) {
+        updateDriverIcon: function(driverName) {
             var isSupported = localforage.supports(localforage[driverName]);
             var className = isSupported ? 'icon-check' : 'icon-close';
             this.$('[data-item=' + driverName + '] > .icon').addClass(className);
         },
 
-        onTabItemChange: function (event) {
+        onTabItemChange: function(event) {
             event.preventDefault();
             var driverName = $(event.currentTarget).data('item');
-            localforage.setDriver(localforage[driverName]).then(_.bind(function () {
+            localforage.setDriver(localforage[driverName]).then(_.bind(function() {
                 this.showActiveDriver();
                 refreshCollection();
             }, this));
@@ -197,7 +197,7 @@
     // Instancing the collection and the view
     var collection = new ListCollection();
 
-    var refreshCollection = function () {
+    var refreshCollection = function() {
         collection.reset(); // clear collection before
         collection.fetch();
     };

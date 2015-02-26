@@ -7,7 +7,8 @@ module.exports = exports = function(grunt) {
     var sourceFiles = [
         'Gruntfile.js',
         'src/*.js',
-        'test/*.js'
+        'test/*.js',
+        'examples/*.js'
     ];
 
     grunt.initConfig({
