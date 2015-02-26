@@ -59,7 +59,7 @@
                   debugger;
                   event.preventDefault();
                   // It'll write on the localforage offline store
-                  this.collection.create({content: this.$('[name="content"]').val()});
+                  this.collection.create({content: this.$input.val()});
               },
 
               render: function () {
@@ -68,7 +68,8 @@
                   this.$el.html(_.template($('#formtpl').html()));
 
                   // cache DOM list container
-                  this.$list = $(this.$el.find('.list')[0]);
+                  this.$list = this.$('.list');
+                  this.$input = this.$('[name="content"]');
                   return this;
               }
           });
