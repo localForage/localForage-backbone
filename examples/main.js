@@ -21,18 +21,6 @@
             'submit form': 'handleSaveModel'
         },
 
-        initialize: function () {
-            // For the sake of the example, this is very bad
-            // performance-wise :)
-            this.listenTo(this.collection, 'add', this.addItemView);
-            this.listenTo(this.collection, 'remove change', this.render);
-        },
-
-        addItemView: function (model) {
-            var itemView = new ItemView({model: model});
-            this.$list.append(itemView.render().el);
-        },
-
         handleSaveModel: function (event) {
             event.preventDefault();
             // It'll write on the localforage offline store
@@ -48,16 +36,30 @@
             this.$el.html(this.template());
 
             // cache DOM list container
-            this.$list = this.$('.list');
             this.$input = this.$('[name="content"]');
             return this;
         }
     });
 
+    var ListView = Backbone.View.extend({
+      tagName: 'ul',
+      className: 'table-view',
+
+      initialize: function () {
+          this.listenTo(this.collection, 'add', this.addItemView);
+          this.listenTo(this.collection, 'remove change', this.render);
+      },
+
+      addItemView: function (model) {
+          var itemView = new ItemView({model: model});
+          this.$el.append(itemView.render().el);
+      }
+    });
+
     var ItemView = Backbone.View.extend({
-        tagName: 'li',
-        className: 'list--item',
         template: _.template($('#itemtpl').html()),
+        tagName: 'li',
+        className: 'table-view-cell',
 
         render: function () {
             this.$el.html(this.template({
@@ -69,11 +71,18 @@
 
     // Instancing the collection and the view
     var collection = new ListCollection();
+
     var formView = new FormView({
-        el: $('<div>', {'class': 'content'}).appendTo(document.body),
+        el: $('header'),
+        collection: collection
+    });
+
+    var listView = new ListView({
         collection: collection
     });
 
     formView.render();
+    $('.content').append(listView.render().el);
+
     collection.fetch();
 }(this.Backbone, this.$, this._));
