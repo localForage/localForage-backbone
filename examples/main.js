@@ -18,10 +18,11 @@
     var FormView = Backbone.View.extend({
         template: _.template($('#formtpl').html()),
         events: {
-            'submit form': 'handleSaveModel'
+            'click [data-action="add"]': 'addItem',
+            'click [data-action="refresh"]': 'refresh'
         },
 
-        handleSaveModel: function (event) {
+        addItem: function (event) {
             event.preventDefault();
             // It'll write on the localforage offline store
             this.collection.create({content: this.$input.val()});
@@ -38,6 +39,11 @@
             // cache DOM list container
             this.$input = this.$('[name="content"]');
             return this;
+        },
+
+        refresh: function (event) {
+            event.preventDefault();
+            collection.fetch();
         }
     });
 
@@ -48,7 +54,7 @@
       initialize: function () {
           this.listenTo(this.collection, 'add', this.addItemView);
           this.listenTo(this.collection, 'remove', this.removeItem);
-          this.listenTo(this.collection, 'change', this.render);
+          this.listenTo(this.collection, 'sync', this.render);
           this._itemsView = {};
       },
 

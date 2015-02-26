@@ -11,7 +11,12 @@
 
     <script type="template/form" id="formtpl">
         <form>
-            <button class="btn btn-positive btn-nav pull-right">Add</button>
+            <button class="btn btn-rounded btn-nav pull-right" data-action="refresh">
+              <span class="icon icon-refresh"></span>
+            </button>
+            <button class="btn btn-rounded btn-nav pull-right" data-action="add">
+              <span class="icon icon-plus"></span>
+            </button>
             <div class="input-wrapper">
                 <input type="text" name="content" placeholder="text" />
             </div>
@@ -47,11 +52,17 @@
             margin-top: 0;
         }
 
-        .btn-rounded {
+        .bar .btn-rounded, .btn-rounded {
             padding: 0;
             border-radius: 15px;
             height: 30px;
             width: 30px;
+            font-size: 15px;
+        }
+
+        .bar .btn-rounded .icon {
+            font-size: 15px;
+            top: 0;
         }
     </style>
   </head>
