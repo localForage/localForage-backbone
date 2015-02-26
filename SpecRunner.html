@@ -17,6 +17,16 @@
   <script src="bower_components/localforage/dist/localforage.js"></script>
   <script src="src/localforage.backbone.js"></script>
 
+  <script>
+      // set database name for tests
+      // it may conflict with example database if you open both in the same browser
+      // as they will have the localforage name by default.
+      Backbone.localforage.localforageInstance.config({
+          driver: localforage.LOCALSTORAGE,
+          name: 'test'
+      });
+  </script>
+
   <!-- include spec files here... -->
   <script src="test/backbone.model.js"></script>
   <script src="test/backbone.collection.js"></script>
