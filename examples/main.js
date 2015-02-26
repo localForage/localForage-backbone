@@ -66,7 +66,7 @@
 
         refresh: function (event) {
             event.preventDefault();
-            collection.fetch({reset: true});
+            refreshCollection();
         },
 
         updateSaveIcon: function () {
@@ -81,6 +81,7 @@
       initialize: function () {
           this.listenTo(this.collection, 'add', this.addItemView);
           this.listenTo(this.collection, 'remove', this.removeItem);
+          this.listenTo(this.collection, 'reset', this.reset);
           this._itemsView = {};
       },
 
@@ -96,8 +97,12 @@
           delete this._itemsView[model.id];
       },
 
+      reset: function (model, options) {
+        options.previousModels.map(this.removeItem, this);
+      },
+
       render: function () {
-          this.collection.map(this.addItemView);
+          this.collection.map(this.addItemView, this);
           return this;
       }
     });
@@ -117,8 +122,14 @@
         },
 
         render: function () {
+            // build the model localeForage key only for debug purpose
+            // at this point this key might not have been set if no sync
+            // operation has been made
+            this.model.sync._localeForageKeyFn(this.model);
+
             this.$el.html(this.template({
-                content: this.model.get('content')
+                content: this.model.get('content'),
+                syncKey: this.model.sync.localforageKey
             }));
             return this;
         },
@@ -176,14 +187,20 @@
         onTabItemChange: function (event) {
             event.preventDefault();
             var driverName = $(event.currentTarget).data('item');
-            localforage.setDriver(localforage[driverName]).then(
-                _.bind(this.showActiveDriver, this)
-            );
+            localforage.setDriver(localforage[driverName]).then(_.bind(function () {
+                this.showActiveDriver();
+                refreshCollection();
+            }, this));
         }
     });
 
     // Instancing the collection and the view
     var collection = new ListCollection();
+
+    var refreshCollection = function () {
+        collection.reset(); // clear collection before
+        collection.fetch();
+    };
 
     var formView = new FormView({
         el: $('header'),
