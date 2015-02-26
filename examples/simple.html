@@ -18,7 +18,10 @@
         </form>
     </script>
     <script type="template/form" id="itemtpl">
-        <p><%= content %></p>
+        <%= content %>
+        <button class="btn btn-rounded">
+            <span class="icon icon-close"></span>
+        </button>
     </script>
 
     <link rel="stylesheet" href="../bower_components/ratchet/dist/css/ratchet.css"></link>
@@ -44,6 +47,12 @@
             margin-top: 0;
         }
 
+        .btn-rounded {
+            padding: 0;
+            border-radius: 15px;
+            height: 30px;
+            width: 30px;
+        }
     </style>
   </head>
   <body>
