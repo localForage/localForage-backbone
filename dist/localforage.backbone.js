@@ -1,6 +1,6 @@
 /*!
     localForage Backbone Adapter
-    Version 0.4.0
+    Version 0.5.0
     https://github.com/mozilla/localforage-backbone
     (c) 2014 Mozilla, Apache License 2.0
 */
@@ -30,7 +30,7 @@
 //
 // Inspiration for this file comes from a few backbone.localstorage
 // implementations.
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(['localforage', 'backbone', 'underscore'], factory);
     } else if (typeof module !== 'undefined' && module.exports) {
@@ -41,49 +41,46 @@
     } else {
         factory(root.localforage, root.Backbone, root._);
     }
-}(this, function (localforage, Backbone, _) {
+}(this, function(localforage, Backbone, _) {
     function S4() {
+        // jshint -W016
         return ((1 + Math.random()) * 65536 | 0).toString(16).substring(1);
+        // jshint +W016
     }
 
     function guid() {
-        return S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4();
+        return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
     }
 
     // For now, we aren't complicated: just set a property off Backbone to
     // serve as our export point.
     Backbone.localforage = {
+        localforageInstance: localforage,
+
         sync: function(name) {
-            var _this = this;
+            var self = this;
             var sync = function(method, model, options) {
                 // If `this` is a `Backbone.Collection` it means
                 // `Backbone.Collection#fetch` has been called.
                 if (this instanceof Backbone.Collection) {
-                    // If there's no localforageKey for this collection, create
-                    // it.
-                    if (!this.sync.localforageKey) {
-                        this.sync.localforageKey = name;
-                    }
+                    model.sync.localforageKey = name;
                 } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
                     // Generate an id if one is not set yet.
                     if (!model.id) {
                         model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
                     }
 
-                    // If there's no localforageKey for this model create it
-                    if (!model.sync.localforageKey) {
-                        model.sync.localforageKey = name + "/" + model.id;
-                    }
+                    model.sync.localforageKey = name + '/' + model.id;
                 }
                 switch (method) {
-                    case "read":
-                        return model.id ? _this.find(model, options) : _this.findAll(model, options);
-                    case "create":
-                        return _this.create(model, options);
-                    case "update":
-                        return _this.update(model, options);
-                    case "delete":
-                        return _this.destroy(model, options);
+                    case 'read':
+                        return model.id ? self.find(model, options) : self.findAll(model, options);
+                    case 'create':
+                        return self.create(model, options);
+                    case 'update':
+                        return self.update(model, options);
+                    case 'delete':
+                        return self.destroy(model, options);
                 }
             };
 
@@ -147,7 +144,7 @@
         findAll: function(collection, callbacks) {
             localforage.getItem(collection.sync.localforageKey, function(err, data) {
                 if (!err && data && data.length) {
-                    var done = function () {
+                    var done = function() {
                         if (callbacks.success) {
                             callbacks.success(data);
                         }
