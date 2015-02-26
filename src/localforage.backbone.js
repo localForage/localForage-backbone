@@ -97,7 +97,7 @@
                     });
 
                     if (!model.collection.sync.localforageKey){
-                        model.collection.sync.localforageKey = model.collection.sync._localforageNamespace
+                        model.collection.sync.localforageKey = model.collection.sync._localforageNamespace;
                     }
 
                     // Bind `data` to `callback` to call after
