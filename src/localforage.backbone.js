@@ -59,6 +59,10 @@
             // `model.collection` models' ids are persisted.
             callback = callback ? _.partial(callback, err, data) : void 0;
 
+            if (!collection.sync.localforageKey) {
+                collection.sync.localforageKey = collection.sync._localforageNamespace;
+            }
+
             // Persist `model.collection` models' ids.
             localforage.setItem(collection.sync.localforageKey, collectionData, callback);
         }

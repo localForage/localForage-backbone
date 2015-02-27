@@ -81,4 +81,32 @@ describe('Backbone.Collection', function() {
             });
         });
     });
+
+    describe('check that key is available even for unsynced collection', function() {
+        var anotherCollection;
+
+        var AnotherCollection = Backbone.Collection.extend({
+            // Making sure we use an unique localforage namespace by using Date.now
+            sync: Backbone.localforage.sync(Date.now()),
+            model: Backbone.Model.extend({
+                sync: Backbone.localforage.sync('model')
+            })
+        });
+
+        it('localforageKey should not be defined when unsynced', function() {
+            anotherCollection = new AnotherCollection();
+            expect(anotherCollection.sync.localforageKey).toBeUndefined();
+        });
+
+        it('localforageKey should be set for collection on model sync prior to collection sync (collection.create)', function(done) {
+            // calling create will create a model and call save() on your behalf
+            anotherCollection.create({foo: 'bar'}, {
+                success: function() {
+                    expect(anotherCollection.sync.localforageKey).not.toBeUndefined();
+                    done();
+                }
+            });
+        });
+    });
+
 });
