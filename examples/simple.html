@@ -92,7 +92,7 @@
         .bar a.btn .icon {
             top: 6px;
         }
-        
+
         .table-view-cell {
             padding-right: 15px;
         }
@@ -121,13 +121,49 @@
         .tab-item.active {
             background-color: rgba(0,0,0,.15);
         }
+
+        @media screen and (min-width: 768px) {
+            .device {
+                position: relative;
+                top: 10px;
+                display: block;
+                width: 395px;
+                height: 813px;
+                margin: 0 auto;
+                background-image: url(img/device.png);
+                background-repeat: no-repeat;
+                background-position: 0 0;
+                background-size: 100%;
+            }
+
+            .device-content {
+                position: absolute;
+                top: 117px;
+                left: 37px;
+                width: 321px;
+                height: 569px;
+                overflow: hidden;
+                font-size: 17px;
+                line-height: 21px;
+                background-color: #fff;
+            }
+
+            .bar {
+                position: absolute;
+            }
+        }
+
     </style>
   </head>
   <body>
-    <div class="container">
-      <header class="bar bar-nav"></header>
-      <div class="content"></div>
-      <footer class="bar bar-tab"></footer>
+    <div class="device">
+      <div class="device-content">
+        <div class="container">
+          <header class="bar bar-nav"></header>
+          <div class="content"></div>
+          <footer class="bar bar-tab"></footer>
+        </div>
+      </div>
     </div>
 
     <script src="./main.js"></script>
