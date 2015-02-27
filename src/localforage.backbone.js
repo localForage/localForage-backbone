@@ -57,7 +57,7 @@
 
             // Bind `data` to `callback` to call after
             // `model.collection` models' ids are persisted.
-            callback = callback ? _.partial(callback, err, data) : void 0;
+            callback = callback ? _.partial(callback, err, data) : undefined;
 
             if (!collection.sync.localforageKey) {
                 localforageKey(collection);
