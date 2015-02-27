@@ -54,6 +54,7 @@
 
         editItem: function(model) {
             this.$input.val(model.get('content'));
+            this.$input.focus();
             this.updateSaveIcon();
 
             // keep reference to current model edited
