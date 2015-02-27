@@ -1,9 +1,9 @@
 (function(Backbone, $, _) {
     'use strict';
 
-    // Set driver (optional, but we use localforage here so developers
+    // Set driver (optional, but we use localstorage here so developers
     // can more easily inspect it).
-    localforage.setDriver('localStorageWrapper');
+    localforage.setDriver(localforage.LOCALSTORAGE);
 
     // We store offline data inside a collection. This is how we tell
     // a model/collection to store data offline with localForage.
