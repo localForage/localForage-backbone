@@ -46,6 +46,28 @@
         return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
     }
 
+    function updateCollectionReferences(collection, callback, err, data) {
+        // If this model has a collection, keep the collection in =
+        // sync as well.
+        if (collection) {
+            // Create an array of `model.collection` models' ids.
+            var collectionData = collection.map(function(model) {
+                return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
+            });
+
+            // Bind `data` to `callback` to call after
+            // `model.collection` models' ids are persisted.
+            callback = callback ? _.partial(callback, err, data) : void 0;
+
+            if (!collection.sync.localforageKey) {
+                collection.sync.localforageKey = collection.sync._localforageNamespace;
+            }
+
+            // Persist `model.collection` models' ids.
+            localforage.setItem(collection.sync.localforageKey, collectionData, callback);
+        }
+    }
+
     // For now, we aren't complicated: just set a property off Backbone to
     // serve as our export point.
     Backbone.localforage = {
@@ -87,21 +109,9 @@
 
         save: function(model, callback) {
             localforage.setItem(model.sync.localforageKey, model.toJSON(), function(err, data) {
-                // If this model has a collection, keep the collection in =
-                // sync as well.
+                // keep the collection in sync
                 if (model.collection) {
-                    var collection = model.collection;
-                    // Create an array of `model.collection` models' ids.
-                    var collectionData = collection.map(function(model) {
-                        return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
-                    });
-
-                    // Bind `data` to `callback` to call after
-                    // `model.collection` models' ids are persisted.
-                    callback = callback ? _.partial(callback, err, data) : void 0;
-
-                    // Persist `model.collection` models' ids.
-                    localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
+                    updateCollectionReferences(model.collection, callback, err, data);
                 } else if (callback) {
                     callback(data);
                 }
@@ -166,10 +176,13 @@
         },
 
         destroy: function(model, callbacks) {
+            var collection = model.collection;
             localforage.removeItem(model.sync.localforageKey, function() {
-                var json = model.toJSON();
-                if (callbacks.success) {
-                    callbacks.success(json);
+                // keep the collection in sync
+                if (collection) {
+                    updateCollectionReferences(collection, callbacks.success, null, model.toJSON());
+                } else if (callbacks.success) {
+                    callbacks.success(model.toJSON());
                 }
             });
         }
