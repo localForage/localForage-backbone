@@ -8,75 +8,164 @@
     <script src="../bower_components/backbone/backbone.js"></script>
     <script src="../bower_components/localforage/dist/localforage.js"></script>
     <script src="../dist/localforage.backbone.js"></script>
-  </head>
-  <body>
+
     <script type="template/form" id="formtpl">
         <form>
-            <input type="text" name="content" />
-            <input type="submit" value="Create" />
+            <a class="btn btn-rounded btn-nav pull-left" data-action="clear">
+              <span class="icon icon-trash"></span>
+            </a>
+            <a class="btn btn-rounded btn-nav pull-left" data-action="refresh">
+              <span class="icon icon-refresh"></span>
+            </a>
+            <button class="btn btn-rounded btn-nav pull-right" data-action="add">
+              <span class="icon icon-plus"></span>
+            </button>
+            <div class="input-wrapper">
+                <input type="text" name="content" placeholder="text" />
+            </div>
         </form>
     </script>
-    <script>
-      (function (Backbone, _) {
-          'use strict';
-
-          // Set driver (optional, but we use localforage here so developers
-          // can more easily inspect it).
-          localforage.setDriver('localStorageWrapper');
-
-          // We store offline data inside a collection. This is how we tell
-          // a model/collection to store data offline with localForage.
-          var MyCollection = Backbone.Collection.extend({
-              sync: Backbone.localforage.sync('MyCollection'),
-              model: Backbone.Model.extend({
-                  sync: Backbone.localforage.sync('ModelNamespace')
-              })
-          });
-
-          // A view with a form and the collection contents
-          var MyFormView = Backbone.View.extend({
-              events: {
-                  'submit form': 'handleSaveModel'
-              },
-
-              initialize: function (options) {
-                  // For the sake of the example, this is very bad
-                  // performance-wise :)
-                  this.listenTo(this.collection, 'add remove change sync', this.render);
-              },
-
-              createModel: function (model) {
-                  return $("<div>", {
-                      'class': 'saved-data',
-                      text: model.get('content')
-                  });
-              },
-
-              handleSaveModel: function (event) {
-                  event.preventDefault();
-                  // It'll write on the localforage offline store
-                  this.collection.create({content: this.$('[name="content"]').val()});
-              },
-
-              render: function () {
-                  // Render the form template on this.$el and append the
-                  // collection content
-                  this.$el
-                      .html(_.template($('#formtpl').html()))
-                      .append(this.collection.map(this.createModel));
-              }
-          });
-
-          // Instancing the collection and the view
-          var collectionInstance = new MyCollection();
-          var myFormView = new MyFormView({
-              el: $('<div>', {'class': 'content'}).appendTo(document.body),
-              collection: collectionInstance
-          });
-
-          myFormView.render();
-          collectionInstance.fetch();
-      }(this.Backbone, this._));
+    <script type="template/form" id="itemtpl">
+        <div class="pull-right">
+            <button class="btn btn-rounded" data-action="edit">
+                <span class="icon icon-edit"></span>
+            </button>
+            <button class="btn btn-rounded" data-action="delete">
+                <span class="icon icon-trash"></span>
+            </button>
+        </div>
+        <p class="item-content"><%= content %></p>
+        <p class="item-sync-key"><%= syncKey %></p>
     </script>
+
+    <script type="template/form" id="footertpl">
+        <a class="tab-item" data-item="LOCALSTORAGE">
+            <span class="icon"></span>
+            <span class="tab-label">Local Storage</span>
+        </a>
+        <a class="tab-item" data-item="WEBSQL">
+            <span class="icon"></span>
+            <span class="tab-label">WebSql</span>
+        </a>
+        <a class="tab-item" data-item="INDEXEDDB">
+            <span class="icon"></span>
+            <span class="tab-label">IndexedDB</span>
+        </a>
+    </script>
+
+    <link rel="stylesheet" href="../bower_components/ratchet/dist/css/ratchet.css"></link>
+    <style>
+        .bar .btn, input[type=text] {
+            height: 30px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            top: 7px;
+            margin: 0px auto 0;
+            height: 30px;
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 400;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+        }
+
+        .content > .table-view:first-child {
+            margin-top: 0;
+        }
+
+        .bar .btn-rounded, .btn-rounded {
+            padding: 0;
+            border-radius: 15px;
+            height: 30px;
+            width: 30px;
+            font-size: 15px;
+        }
+
+        .bar .btn-rounded .icon {
+            font-size: 15px;
+            top: 0;
+        }
+
+        .bar a.btn .icon {
+            top: 6px;
+        }
+
+        .table-view-cell {
+            padding-right: 15px;
+        }
+
+        .table-view-cell p {
+            word-wrap: break-word;
+        }
+
+        .item-content {
+            padding-right: 70px;
+        }
+
+        .item-sync-key {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .tab-item .icon-check {
+            color: #5cb85c;
+        }
+
+        .tab-item .icon-close {
+            color: #d9534f;
+        }
+
+        .tab-item.active {
+            background-color: rgba(0,0,0,.15);
+        }
+
+        @media screen and (min-width: 768px) {
+            .device {
+                position: relative;
+                top: 10px;
+                display: block;
+                width: 390px;
+                height: 756px;
+                margin: 0 auto;
+                background-image: url(img/device.png);
+                background-repeat: no-repeat;
+                background-position: 0 0;
+                background-size: 100%;
+            }
+
+            .device-content {
+                position: absolute;
+                top: 103px;
+                left: 38px;
+                width: 312px;
+                height: 518px;
+                overflow: hidden;
+                font-size: 17px;
+                line-height: 21px;
+                background-color: #fff;
+            }
+
+            .bar {
+                position: absolute;
+            }
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="device">
+      <div class="device-content">
+        <div class="container">
+          <header class="bar bar-nav"></header>
+          <div class="content"></div>
+          <footer class="bar bar-tab"></footer>
+        </div>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
   </body>
 </html>
