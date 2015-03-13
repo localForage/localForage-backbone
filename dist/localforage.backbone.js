@@ -1,6 +1,6 @@
 /*!
     localForage Backbone Adapter
-    Version 0.5.0
+    Version 0.6.0
     https://github.com/mozilla/localforage-backbone
     (c) 2014 Mozilla, Apache License 2.0
 */
@@ -52,6 +52,43 @@
         return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
     }
 
+    function updateCollectionReferences(collection, callback, err, data) {
+        // If this model has a collection, keep the collection in =
+        // sync as well.
+        if (collection) {
+            // Create an array of `model.collection` models' ids.
+            var collectionData = collection.map(function(model) {
+                return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
+            });
+
+            // Bind `data` to `callback` to call after
+            // `model.collection` models' ids are persisted.
+            callback = callback ? _.partial(callback, err, data) : undefined;
+
+            if (!collection.sync.localforageKey) {
+                localforageKey(collection);
+            }
+
+            // Persist `model.collection` models' ids.
+            localforage.setItem(collection.sync.localforageKey, collectionData, callback);
+        }
+    }
+
+    function localforageKey(model) {
+        // If `this` is a `Backbone.Collection` it means
+        // `Backbone.Collection#fetch` has been called.
+        if (model instanceof Backbone.Collection) {
+            model.sync.localforageKey = model.sync._localforageNamespace;
+        } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
+            // Generate an id if one is not set yet.
+            if (!model.id) {
+                model[model.idAttribute] = model.attributes[model.idAttribute] = guid();
+            }
+
+            model.sync.localforageKey = model.sync._localforageNamespace + '/' + model.id;
+        }
+    }
+
     // For now, we aren't complicated: just set a property off Backbone to
     // serve as our export point.
     Backbone.localforage = {
@@ -60,18 +97,8 @@
         sync: function(name) {
             var self = this;
             var sync = function(method, model, options) {
-                // If `this` is a `Backbone.Collection` it means
-                // `Backbone.Collection#fetch` has been called.
-                if (this instanceof Backbone.Collection) {
-                    model.sync.localforageKey = name;
-                } else { // `this` is a `Backbone.Model` if not a `Backbone.Collection`.
-                    // Generate an id if one is not set yet.
-                    if (!model.id) {
-                        model[this.idAttribute] = model.attributes[this.idAttribute] = guid();
-                    }
+                localforageKey(model);
 
-                    model.sync.localforageKey = name + '/' + model.id;
-                }
                 switch (method) {
                     case 'read':
                         return model.id ? self.find(model, options) : self.findAll(model, options);
@@ -88,26 +115,18 @@
             // the adapter.
             sync._localforageNamespace = name;
 
+            // expose function used to create the localeForage key
+            // this enable to have the key set before sync is called
+            sync._localeForageKeyFn = localforageKey;
+
             return sync;
         },
 
         save: function(model, callback) {
             localforage.setItem(model.sync.localforageKey, model.toJSON(), function(err, data) {
-                // If this model has a collection, keep the collection in =
-                // sync as well.
+                // keep the collection in sync
                 if (model.collection) {
-                    var collection = model.collection;
-                    // Create an array of `model.collection` models' ids.
-                    var collectionData = collection.map(function(model) {
-                        return collection.model.prototype.sync._localforageNamespace + '/' + model.id;
-                    });
-
-                    // Bind `data` to `callback` to call after
-                    // `model.collection` models' ids are persisted.
-                    callback = callback ? _.partial(callback, err, data) : void 0;
-
-                    // Persist `model.collection` models' ids.
-                    localforage.setItem(model.collection.sync.localforageKey, collectionData, callback);
+                    updateCollectionReferences(model.collection, callback, err, data);
                 } else if (callback) {
                     callback(data);
                 }
@@ -172,10 +191,13 @@
         },
 
         destroy: function(model, callbacks) {
+            var collection = model.collection;
             localforage.removeItem(model.sync.localforageKey, function() {
-                var json = model.toJSON();
-                if (callbacks.success) {
-                    callbacks.success(json);
+                // keep the collection in sync
+                if (collection) {
+                    updateCollectionReferences(collection, callbacks.success, null, model.toJSON());
+                } else if (callbacks.success) {
+                    callbacks.success(model.toJSON());
                 }
             });
         }
