@@ -20,19 +20,18 @@ models so they're saved to localForage instead of a REST server. Simply
 override your objects' `sync()` method with the namespace for your model:
 
 ```javascript
-    var MyModel = Backbone.Model.extend({
-        sync: Backbone.localforage.sync('MyModel')
-    });
+var MyModel = Backbone.Model.extend({
+    sync: Backbone.localforage.sync('MyModel')
+});
 
-    var MyCollection = Backbone.Collection.extend({
-        model: MyModel,
-        sync: Backbone.localforage.sync('MyCollection')
-    });
+var MyCollection = Backbone.Collection.extend({
+    model: MyModel,
+    sync: Backbone.localforage.sync('MyCollection')
+});
 ```
 
 Now whenever you save your collections or models, they'll be saved with
 localForage!
-
 
 ## Warning
 
@@ -51,8 +50,6 @@ collection.get(id).destroy();
 // retrieve a model by its index in the collection and destroy it
 collection.at(index).destroy();
 ```
-
-
 
 # License
 
